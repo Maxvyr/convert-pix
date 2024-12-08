@@ -40,8 +40,8 @@ Make sure you have the following installed on your machine:
 **Cloning the Repository**
 
 ```bash
-git clone https://github.com/your-username/your-project.git
-cd your-project
+git clone https://github.com/akshaynstack/convertpix.git
+cd convertpix
 ```
 
 **Installation**
