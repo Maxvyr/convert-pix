@@ -82,7 +82,7 @@ const Dropzone = () => {
   const [defaultValues, setDefaultValues] = useState<string>("video");
   const [selected, setSelected] = useState<string>("...");
   const [isDone, setIsDone] = useState<boolean>(false);
-  const [isCoverting, setIsConverting] = useState<boolean>(false);
+  const [isConverting, setIsConverting] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   // functions
@@ -145,11 +145,10 @@ const Dropzone = () => {
   };
 
   const updateAction = (file_name: String, to: String) => {
-
     setActions(
       actions.map((action): Action => {
         // console.log(action.file_name);
-        
+
         if (action.file_name === file_name) {
           console.log("FOUND");
           return {
@@ -166,22 +165,22 @@ const Dropzone = () => {
   const convert = async (): Promise<any> => {
     let tmp_actions = actions.map((elt) => ({
       ...elt,
-      isCoverting: true,
+      isConverting: true,
     }));
     setActions(tmp_actions);
     setIsConverting(true);
     for (let action of tmp_actions) {
       try {
-        const { url, output } = await convertFile(ffmpegRef.current, action);
+        const data = await convertFile(ffmpegRef.current, action);
 
         tmp_actions = tmp_actions.map((elt) =>
           elt === action
             ? {
                 ...elt,
                 is_converted: true,
-                isCoverting: false,
-                url,
-                output,
+                isConverting: false,
+                url: data.url,
+                output: data.output,
               }
             : elt
         );
@@ -192,7 +191,7 @@ const Dropzone = () => {
             ? {
                 ...elt,
                 is_converted: false,
-                isCoverting: false,
+                isConverting: false,
                 is_error: true,
               }
             : elt
@@ -251,6 +250,7 @@ const Dropzone = () => {
   }, []);
 
   if (actions.length) {
+    console.log(actions);
     return (
       <div className="space-y-6">
         {actions.map((action: any, index: any) => (
@@ -287,7 +287,7 @@ const Dropzone = () => {
                 <span>Done</span>
                 <MdDone />
               </Badge>
-            ) : action.isCoverting ? (
+            ) : action.isConverting ? (
               <Badge variant="default" className="flex gap-2">
                 <span>Converting</span>
                 <span className="animate-spin">
@@ -299,7 +299,6 @@ const Dropzone = () => {
                 <span>Convert to</span>
                 <Select
                   onValueChange={(value) => {
-
                     if (extensions.audio.includes(value)) {
                       setDefaultValues("audio");
                     } else if (extensions.video.includes(value)) {
@@ -412,11 +411,11 @@ const Dropzone = () => {
           ) : (
             <Button
               size="lg"
-              disabled={!isReady || isCoverting}
+              disabled={!isReady || isConverting}
               className="rounded-xl font-semibold relative py-4 text-md flex items-center w-44 bg-gradient-to-r from-indigo-500 to-purple-500"
               onClick={convert}
             >
-              {isCoverting ? (
+              {isConverting ? (
                 <span className="animate-spin text-lg">
                   <ImSpinner3 />
                 </span>
